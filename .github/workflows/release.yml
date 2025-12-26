@@ -28,6 +28,9 @@ jobs:
                      CODE_SIGN_IDENTITY="-" \
                      CODE_SIGN_ENTITLEMENTS="" \
                      CODE_SIGNING_REQUIRED="NO" \
+                     MACOSX_DEPLOYMENT_TARGET=12 \
+                     ARCHS="x86_64 arm64" \
+                     ONLY_ACTIVE_ARCH=NO \
                      clean build
 
       # Package the binary into a .tar.gz file
