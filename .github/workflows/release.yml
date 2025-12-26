@@ -1,0 +1,59 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    name: Build binary and publish release
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Extract version from tag (e.g., v1.0.0)
+      - name: Get the version
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      # Build using Ad-hoc signature and remove entitlements
+      - name: Build with Xcode
+        run: |
+          xcodebuild -scheme pinentry-swift \
+                     -configuration Release \
+                     -derivedDataPath build \
+                     CODE_SIGN_IDENTITY="-" \
+                     CODE_SIGN_ENTITLEMENTS="" \
+                     CODE_SIGNING_REQUIRED="NO" \
+                     clean build
+
+      # Package the binary into a .tar.gz file
+      - name: Package Binary
+        run: |
+          cd build/Build/Products/Release/
+          
+          # Verify binary existence
+          if [ ! -f "pinentry-swift" ]; then
+            echo "Binary not found!"
+            exit 1
+          fi
+          
+          # Ensure executable permissions
+          chmod +x pinentry-swift
+          
+          # Create archive with version number
+          tar -czf ../../../../pinentry-swift-${{ env.VERSION }}.tar.gz pinentry-swift
+
+      # Create GitHub Release and upload the asset
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: pinentry-swift-${{ env.VERSION }}.tar.gz
+          generate_release_notes: true
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
