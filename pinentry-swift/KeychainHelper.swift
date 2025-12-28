@@ -10,7 +10,7 @@ class KeychainHelper {
         let cleanAccount = account.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !cleanAccount.isEmpty else { return }
         
-        let data = pass.data(using: .utf8)!
+        guard let data = pass.data(using: .utf8) else { return }
         
         let finalLabel = label ?? "GnuPG"
         let query: [String: Any] = [

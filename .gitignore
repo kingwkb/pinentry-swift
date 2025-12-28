@@ -4,3 +4,4 @@ xcuserdata/
 *.xcuserstate
 build/
 Secrets.xcconfig
+build.sh

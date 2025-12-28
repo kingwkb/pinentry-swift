@@ -113,7 +113,7 @@ class ProtocolParser {
             
         case "version":
             let info = Bundle.main.infoDictionary
-            let short = info?["CFBundleShortVersionString"] as? String ?? "1.0"
+            let short = info?["CFBundleShortVersionString"] as? String ?? "0.0.1"
             let build = info?["CFBundleVersion"] as? String ?? "1"
             return "D \(short) (\(build))\nOK"
             
@@ -142,7 +142,7 @@ class ProtocolParser {
         if repeatPrompt == nil, errorText == nil, allowExternalCache,
            let savedPass = KeychainHelper.load(account: keyInfo) {
             // Note: System prompts for biometrics if AccessControl is set on the item
-            let (success, _) = BiometricsHelper.authenticate(reason: self.windowTitle)
+            let (success, _) = BiometricsHelper.authenticate(reason: "Authenticate to access your GPG key")
             if success {
                 return "D \(escape(savedPass))\nOK"
             }

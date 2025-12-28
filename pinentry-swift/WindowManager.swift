@@ -107,15 +107,19 @@ class WindowManager {
         )
         win.center()
         win.title = title
+        // Security: Floating level ensures it stays above standard windows
         win.level = .floating
+        // Security: Allow joining all spaces (desktops) and display over full-screen apps
+        win.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         win.isReleasedWhenClosed = false
         win.contentViewController = NSHostingController(rootView: view)
         
         self.window = win
         
-        NSApp.setActivationPolicy(.regular)
+//        NSApp.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)
         win.makeKeyAndOrderFront(nil)
+        win.orderFrontRegardless()
     }
     
     private func safeClose(completion: @escaping () -> Void) {
@@ -126,7 +130,7 @@ class WindowManager {
         
         currentWindow.makeFirstResponder(nil)
         currentWindow.orderOut(nil)
-        NSApp.setActivationPolicy(.accessory)
+//        NSApp.setActivationPolicy(.accessory)
         
         completion()
         
