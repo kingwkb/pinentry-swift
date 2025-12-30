@@ -5,7 +5,7 @@ class WindowManager {
     static let shared = WindowManager()
     
     private var window: NSWindow?
-    private var retainingWindow: NSWindow?
+    // private var retainingWindow: NSWindow?
     
     // MARK: - Public API
     
@@ -134,11 +134,11 @@ class WindowManager {
         
         completion()
         
-        self.retainingWindow = currentWindow
+        // self.retainingWindow = currentWindow
         self.window = nil
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.retainingWindow = nil
-        }
+        // DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        //     self.retainingWindow = nil
+        // }
     }
 }

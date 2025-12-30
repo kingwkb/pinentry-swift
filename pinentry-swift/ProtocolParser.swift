@@ -152,12 +152,14 @@ class ProtocolParser {
         let sema = DispatchSemaphore(value: 0)
         var result: String? = nil
         var shouldSave = false
+        var isTimeout = false
         
         // Handle Timeout
         var timeoutItem: DispatchWorkItem?
         if timeout > 0 {
             timeoutItem = DispatchWorkItem {
                 DispatchQueue.main.async { WindowManager.shared.forceClose() }
+                isTimeout = true
                 sema.signal()
             }
             DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(timeout), execute: timeoutItem!)
@@ -194,6 +196,10 @@ class ProtocolParser {
         self.timeout = 0
         
         guard let pass = result else {
+            if isTimeout {
+                return "ERR 62 Timeout"
+            }
+            // ERR 83886179 = GPG_ERR_CANCELED
             return "ERR 83886179 Operation cancelled"
         }
         
