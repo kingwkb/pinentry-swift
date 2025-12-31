@@ -59,6 +59,4 @@ When prompted for a passphrase:
 
 - **No network access** - All operations are local
 - **Keychain protection** - Passphrases stored in macOS Keychain
-- **Code signed** - When installed via Homebrew
-- **Sandboxing compatible** - Works with macOS security features
 - **Open source** - Fully auditable code
