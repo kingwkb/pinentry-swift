@@ -16,7 +16,36 @@ class AppController: NSObject, NSApplicationDelegate {
         print("OK Pleased to meet you")
         fflush(stdout)
         
+#if DEBUG
+        let fileManager = FileManager.default
+        let logsDirectory = (NSHomeDirectory() as NSString).appendingPathComponent("Desktop/gpg_logs")
+        try? fileManager.createDirectory(atPath: logsDirectory, withIntermediateDirectories: true, attributes: nil)
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyyMMdd_HHmmss_SSS"
+        let timestamp = formatter.string(from: Date())
+        let pid = ProcessInfo.processInfo.processIdentifier
+        
+        let filename = "gpg_session_\(timestamp)_pid\(pid).txt"
+        
+        let logPath = (logsDirectory as NSString).appendingPathComponent(filename)
+        
+        try? "".write(toFile: logPath, atomically: true, encoding: .utf8)
+
+#endif
+        
+        
         while let line = readLine() {
+#if DEBUG
+            if let fileHandle = FileHandle(forWritingAtPath: logPath) {
+                fileHandle.seekToEndOfFile()
+                if let data = "\(line)\n".data(using: .utf8) {
+                    fileHandle.write(data)
+                }
+                fileHandle.closeFile()
+            }
+#endif
+            
             if let response = parser.handleCommand(line) {
                 print(response)
                 fflush(stdout)

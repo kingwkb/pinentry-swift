@@ -36,61 +36,68 @@ class ProtocolParser {
         let args = parts.count > 1 ? parts[1] : ""
         let decodedArgs = args.removingPercentEncoding ?? args
         
+        let isClear = (decodedArgs == "--clear")
+        
         switch cmd {
-        // --- Core Actions ---
+            // --- Core Actions ---
         case "GETPIN":  return performGetPin()
         case "CONFIRM": return performConfirm()
         case "MESSAGE": return performMessage(msg: decodedArgs)
         case "GETINFO": return performGetInfo(args: decodedArgs)
         case "BYE":     return "OK"
             
-        // --- UI Configuration ---
+            // --- UI Configuration ---
         case "SETDESC":
-            self.description = decodedArgs
-            self.generatedKeychainLabel = parseLabel(from: decodedArgs)
+            self.description = isClear ? "Please enter your passphrase" : decodedArgs
+            self.generatedKeychainLabel = isClear ? nil : parseLabel(from: decodedArgs)
             return "OK"
         case "SETPROMPT":
-            self.prompt = decodedArgs
+            self.prompt = isClear ? "Passphrase:" : decodedArgs
             return "OK"
         case "SETTITLE":
-            self.windowTitle = decodedArgs
+            self.windowTitle = isClear ? "GPG Pinentry" : decodedArgs
             return "OK"
         case "SETERROR":
-            self.errorText = "Incorrect passphrase. Please try again."
+            self.errorText = isClear ? nil : (decodedArgs.isEmpty ? "Incorrect passphrase." : decodedArgs)
             return "OK"
         case "SETOK":
-            self.okText = decodedArgs.isEmpty ? "OK" : decodedArgs
+            self.okText = (isClear || decodedArgs.isEmpty) ? "OK" : decodedArgs
             return "OK"
         case "SETCANCEL":
-            self.cancelText = decodedArgs.isEmpty ? "Cancel" : decodedArgs
+            self.cancelText = (isClear || decodedArgs.isEmpty) ? "Cancel" : decodedArgs
             return "OK"
         case "SETNOTOK":
-            self.notOkText = decodedArgs
+            self.notOkText = isClear ? nil : decodedArgs
             return "OK"
         case "SETQUALITYBAR", "SETQUALITYBAR_TT":
             return "OK" // Ignore visual tweaks not supported by native UI
             
-        // --- Logic Configuration ---
+            // --- Logic Configuration ---
         case "SETKEYINFO":
-            // Handle GPG prefixes like "n/ABCD..." or "s/ABCD..."
-            let rawKey = decodedArgs.components(separatedBy: " ").first ?? "default"
-            if let slashIndex = rawKey.firstIndex(of: "/") {
-                self.keyInfo = String(rawKey[rawKey.index(after: slashIndex)...])
+            if isClear {
+                self.keyInfo = "default"
             } else {
-                self.keyInfo = rawKey
+                let rawKey = decodedArgs.components(separatedBy: " ").first ?? "default"
+                if let slashIndex = rawKey.firstIndex(of: "/") {
+                    self.keyInfo = String(rawKey[rawKey.index(after: slashIndex)...])
+                } else {
+                    self.keyInfo = rawKey
+                }
             }
             return "OK"
         case "SETREPEAT":
-            self.repeatPrompt = decodedArgs
+            self.repeatPrompt = isClear ? nil : decodedArgs
             return "OK"
         case "SETREPEATERROR":
-            self.repeatError = decodedArgs
+            self.repeatError = isClear ? "Passphrases do not match" : decodedArgs
             return "OK"
         case "SETTIMEOUT":
-            self.timeout = Int(decodedArgs) ?? 0
+            self.timeout = isClear ? 0 : (Int(decodedArgs) ?? 0)
             return "OK"
         case "OPTION":
-            if decodedArgs.contains("allow-external-password-cache") {
+            if isClear {
+                self.allowExternalCache = false
+            } else if decodedArgs.contains("allow-external-password-cache") {
                 self.allowExternalCache = true
             }
             return "OK"

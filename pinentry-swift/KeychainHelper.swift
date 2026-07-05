@@ -8,7 +8,10 @@ class KeychainHelper {
     
     static func save(_ pass: String, account: String, label: String? = nil) {
         let cleanAccount = account.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !cleanAccount.isEmpty else { return }
+        
+        guard !cleanAccount.isEmpty, cleanAccount != "default", cleanAccount != "--clear" else {
+            return
+        }
         
         guard let data = pass.data(using: .utf8) else { return }
         

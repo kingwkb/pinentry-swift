@@ -6,6 +6,11 @@ enum PinentryMode {
     case message
 }
 
+enum FocusedField {
+    case password
+    case confirmPassword
+}
+
 struct PinentryView: View {
     var mode: PinentryMode
     var title: String
@@ -30,6 +35,8 @@ struct PinentryView: View {
     @State private var saveInKeychain = false
     @State private var localErrorMessage: String? = nil
     
+    @FocusState private var focusedField: FocusedField?
+    
     var body: some View {
         VStack(spacing: 16) {
             // 1. Icon
@@ -41,15 +48,24 @@ struct PinentryView: View {
                 .padding(.top, 8)
             
             // 2. Description / Error Message
-            ScrollView {
-                Text(localErrorMessage ?? desc)
-                    .multilineTextAlignment(.center)
-                    .font((isError || localErrorMessage != nil) ? .headline : .callout)
-                    .foregroundColor((isError || localErrorMessage != nil) ? .red : .primary)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.horizontal)
-            }
-            .frame(maxHeight: 120)
+//            ScrollView {
+//                Text(localErrorMessage ?? desc)
+//                    .multilineTextAlignment(.center)
+//                    .font((isError || localErrorMessage != nil) ? .headline : .callout)
+//                    .foregroundColor((isError || localErrorMessage != nil) ? .red : .primary)
+//                    .fixedSize(horizontal: false, vertical: true)
+//                    .padding(.horizontal)
+//            }
+//            .frame(minHeight: 44, maxHeight: 120)
+            Text(localErrorMessage ?? desc)
+                .multilineTextAlignment(.leading)
+                .font((isError || localErrorMessage != nil) ? .headline : .callout)
+                .foregroundColor((isError || localErrorMessage != nil) ? .red : .primary)
+                .lineLimit(6)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(minHeight: 50, maxHeight: 120, alignment: .leading)
+                .padding(.top, 12)
+
             
             // 3. Technical Key Info (Keygrip)
             if let keyInfo = keyInfo, !keyInfo.isEmpty, keyInfo != "default" {
