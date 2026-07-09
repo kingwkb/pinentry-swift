@@ -52,7 +52,7 @@ When prompted for a passphrase:
 
 ## Requirements
 
-- macOS 12.0 (Monterey) or later
+- macOS 12.4 (Monterey) or later
 - GnuPG 2.x
 
 ## Security

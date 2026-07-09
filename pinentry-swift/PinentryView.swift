@@ -48,15 +48,6 @@ struct PinentryView: View {
                 .padding(.top, 8)
             
             // 2. Description / Error Message
-//            ScrollView {
-//                Text(localErrorMessage ?? desc)
-//                    .multilineTextAlignment(.center)
-//                    .font((isError || localErrorMessage != nil) ? .headline : .callout)
-//                    .foregroundColor((isError || localErrorMessage != nil) ? .red : .primary)
-//                    .fixedSize(horizontal: false, vertical: true)
-//                    .padding(.horizontal)
-//            }
-//            .frame(minHeight: 44, maxHeight: 120)
             Text(localErrorMessage ?? desc)
                 .multilineTextAlignment(.leading)
                 .font((isError || localErrorMessage != nil) ? .headline : .callout)
